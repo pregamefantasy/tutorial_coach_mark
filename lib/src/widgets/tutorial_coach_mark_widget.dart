@@ -15,25 +15,31 @@ class TutorialCoachMarkWidget extends StatefulWidget {
     this.clickTarget,
     this.onClickTargetWithTapPosition,
     this.clickOverlay,
-    this.alignSkip = Alignment.bottomRight,
+    this.alignSkip = Alignment.bottomLeft,
+    this.alignNext = Alignment.bottomRight,
     this.textSkip = "SKIP",
+    this.textNext = "NEXT",
     this.onClickSkip,
     this.colorShadow = Colors.black,
     this.opacityShadow = 0.8,
     this.textStyleSkip = const TextStyle(color: Colors.white),
+    this.textStyleNext = const TextStyle(color: Colors.white),
     this.hideSkip,
+    this.hideNext,
     this.focusAnimationDuration,
     this.unFocusAnimationDuration,
     this.pulseAnimationDuration,
     this.pulseVariation,
     this.pulseEnable = true,
     this.skipWidget,
+    this.nextWidget,
   })  : assert(targets.length > 0),
         super(key: key);
 
   final List<TargetFocus> targets;
   final FutureOr Function(TargetFocus)? clickTarget;
-  final FutureOr Function(TargetFocus, TapDownDetails)? onClickTargetWithTapPosition;
+  final FutureOr Function(TargetFocus, TapDownDetails)?
+      onClickTargetWithTapPosition;
   final FutureOr Function(TargetFocus)? clickOverlay;
   final Function()? finish;
   final Color colorShadow;
@@ -41,21 +47,27 @@ class TutorialCoachMarkWidget extends StatefulWidget {
   final double paddingFocus;
   final Function()? onClickSkip;
   final AlignmentGeometry alignSkip;
+  final AlignmentGeometry alignNext;
   final String textSkip;
+  final String textNext;
   final TextStyle textStyleSkip;
+  final TextStyle textStyleNext;
   final bool? hideSkip;
+  final bool? hideNext;
   final Duration? focusAnimationDuration;
   final Duration? unFocusAnimationDuration;
   final Duration? pulseAnimationDuration;
   final Tween<double>? pulseVariation;
   final bool pulseEnable;
   final Widget? skipWidget;
+  final Widget? nextWidget;
 
   @override
   TutorialCoachMarkWidgetState createState() => TutorialCoachMarkWidgetState();
 }
 
-class TutorialCoachMarkWidgetState extends State<TutorialCoachMarkWidget> implements TutorialCoachMarkController {
+class TutorialCoachMarkWidgetState extends State<TutorialCoachMarkWidget>
+    implements TutorialCoachMarkController {
   final GlobalKey<AnimatedFocusLightState> _focusLightKey = GlobalKey();
   bool showContent = false;
   TargetFocus? currentTarget;
@@ -82,7 +94,8 @@ class TutorialCoachMarkWidgetState extends State<TutorialCoachMarkWidget> implem
               return widget.clickTarget?.call(target);
             },
             clickTargetWithTapPosition: (target, tapDetails) {
-              return widget.onClickTargetWithTapPosition?.call(target, tapDetails);
+              return widget.onClickTargetWithTapPosition
+                  ?.call(target, tapDetails);
             },
             clickOverlay: (target) {
               return widget.clickOverlay?.call(target);
@@ -104,6 +117,7 @@ class TutorialCoachMarkWidgetState extends State<TutorialCoachMarkWidget> implem
             duration: Duration(milliseconds: 300),
             child: _buildContents(),
           ),
+          _buildNext(),
           _buildSkip()
         ],
       ),
@@ -131,7 +145,9 @@ class TutorialCoachMarkWidgetState extends State<TutorialCoachMarkWidget> implem
     double haloHeight;
 
     if (currentTarget!.shape == ShapeLightFocus.Circle) {
-      haloWidth = target.size.width > target.size.height ? target.size.width : target.size.height;
+      haloWidth = target.size.width > target.size.height
+          ? target.size.width
+          : target.size.height;
       haloHeight = haloWidth;
     } else {
       haloWidth = target.size.width;
@@ -162,7 +178,8 @@ class TutorialCoachMarkWidgetState extends State<TutorialCoachMarkWidget> implem
             weight = MediaQuery.of(context).size.width;
             left = 0;
             top = null;
-            bottom = haloHeight + (MediaQuery.of(context).size.height - positioned.dy);
+            bottom = haloHeight +
+                (MediaQuery.of(context).size.height - positioned.dy);
           }
           break;
         case ContentAlign.left:
@@ -201,7 +218,9 @@ class TutorialCoachMarkWidgetState extends State<TutorialCoachMarkWidget> implem
           width: weight,
           child: Padding(
             padding: i.padding,
-            child: i.builder != null ? i.builder?.call(context, this) : (i.child ?? SizedBox.shrink()),
+            child: i.builder != null
+                ? i.builder?.call(context, this)
+                : (i.child ?? SizedBox.shrink()),
           ),
         ),
       );
@@ -231,6 +250,34 @@ class TutorialCoachMarkWidgetState extends State<TutorialCoachMarkWidget> implem
                     Text(
                       widget.textSkip,
                       style: widget.textStyleSkip,
+                    ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNext() {
+    if (widget.hideNext!) {
+      return SizedBox.shrink();
+    }
+    return Align(
+      alignment: currentTarget?.alignNext ?? widget.alignNext,
+      child: SafeArea(
+        child: AnimatedOpacity(
+          opacity: showContent ? 1 : 0,
+          duration: Duration(milliseconds: 300),
+          child: InkWell(
+            onTap: next,
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: IgnorePointer(
+                child: widget.nextWidget ??
+                    Text(
+                      widget.textNext,
+                      style: widget.textStyleNext,
                     ),
               ),
             ),

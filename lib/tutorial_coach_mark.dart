@@ -15,15 +15,20 @@ class TutorialCoachMark {
   final BuildContext _context;
   final List<TargetFocus> targets;
   final FutureOr<void> Function(TargetFocus)? onClickTarget;
-  final FutureOr<void> Function(TargetFocus, TapDownDetails)? onClickTargetWithTapPosition;
+  final FutureOr<void> Function(TargetFocus, TapDownDetails)?
+      onClickTargetWithTapPosition;
   final FutureOr<void> Function(TargetFocus)? onClickOverlay;
   final Function()? onFinish;
   final double paddingFocus;
   final Function()? onSkip;
   final AlignmentGeometry alignSkip;
+  final AlignmentGeometry alignNext;
   final String textSkip;
+  final String textNext;
   final TextStyle textStyleSkip;
+  final TextStyle textStyleNext;
   final bool hideSkip;
+  final bool hideNext;
   final Color colorShadow;
   final double opacityShadow;
   final GlobalKey<TutorialCoachMarkWidgetState> _widgetKey = GlobalKey();
@@ -32,28 +37,30 @@ class TutorialCoachMark {
   final Duration pulseAnimationDuration;
   final bool pulseEnable;
   final Widget? skipWidget;
+  final Widget? nextWidget;
 
   OverlayEntry? _overlayEntry;
 
   TutorialCoachMark(this._context,
       {required this.targets,
-        this.colorShadow = Colors.black,
-        this.onClickTarget,
-        this.onClickTargetWithTapPosition,
-        this.onClickOverlay,
-        this.onFinish,
-        this.paddingFocus = 10,
-        this.onSkip,
-        this.alignSkip = Alignment.bottomRight,
-        this.textSkip = "SKIP",
-        this.textStyleSkip = const TextStyle(color: Colors.white),
-        this.hideSkip = false,
-        this.opacityShadow = 0.8,
-        this.focusAnimationDuration = const Duration(milliseconds: 600),
-        this.unFocusAnimationDuration = const Duration(milliseconds: 600),
-        this.pulseAnimationDuration = const Duration(milliseconds: 500),
-        this.pulseEnable = true,
-        this.skipWidget})
+      this.colorShadow = Colors.black,
+      this.onClickTarget,
+      this.onClickTargetWithTapPosition,
+      this.onClickOverlay,
+      this.onFinish,
+      this.paddingFocus = 10,
+      this.onSkip,
+      this.alignSkip = Alignment.bottomRight,
+      this.textSkip = "SKIP",
+      this.textStyleSkip = const TextStyle(color: Colors.white),
+      this.hideSkip = false,
+      this.opacityShadow = 0.8,
+      this.focusAnimationDuration = const Duration(milliseconds: 600),
+      this.unFocusAnimationDuration = const Duration(milliseconds: 600),
+      this.pulseAnimationDuration = const Duration(milliseconds: 500),
+      this.pulseEnable = true,
+      this.skipWidget,
+      this.nextWidget})
       : assert(opacityShadow >= 0 && opacityShadow <= 1);
 
   OverlayEntry _buildOverlay() {
@@ -68,10 +75,14 @@ class TutorialCoachMark {
           paddingFocus: paddingFocus,
           onClickSkip: skip,
           alignSkip: alignSkip,
+          alignSkip: alignNext,
           skipWidget: skipWidget,
           textSkip: textSkip,
+          textNext: textNext,
           textStyleSkip: textStyleSkip,
+          textStyleNext: textStyleNext,
           hideSkip: hideSkip,
+          hideNext: hideNext,
           colorShadow: colorShadow,
           opacityShadow: opacityShadow,
           focusAnimationDuration: focusAnimationDuration,
